@@ -4,8 +4,10 @@
       <v-container>
         <v-row class="justify-center">
           <v-col cols="12" md="6" lg="7" xl="5">
-            <h1 class="primary sm-col-12 lg-col-4 pr-3 pl-3 d-md-inline-block text-center">
-              <v-icon large class="mr-2">mdi-playlist-check</v-icon>Todo list
+            <h1
+              class="app-title primary--text sm-col-12 lg-col-4 pr-3 pl-3 d-md-inline-block text-center"
+            >
+              <v-icon large class="mr-2" color="primary">mdi-playlist-check</v-icon>Todo list
             </h1>
           </v-col>
         </v-row>
@@ -34,3 +36,8 @@ export default {
   },
 };
 </script>
+<style>
+.app-title {
+  border: 1px solid #ffa000;
+}
+</style>
