@@ -62,7 +62,6 @@ export default {
       });
       localStorage.setItem("todoItems", JSON.stringify(this.todoItems));
       this.itemTitle = "";
-      this.selectedCategory = 1;
       this.$refs.itemTitle.resetValidation();
       this.$refs.selectedCategory.resetValidation();
     },
