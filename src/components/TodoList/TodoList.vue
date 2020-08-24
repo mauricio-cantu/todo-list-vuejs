@@ -1,14 +1,7 @@
 <template>
   <div>
     <v-card dark>
-      <v-tabs
-        v-model="tab"
-        color="primary"
-        centered
-        dark
-        slider-color="primary"
-        @change="resetFormValidation"
-      >
+      <v-tabs v-model="tab" color="primary" centered dark slider-color="primary">
         <v-tab key="items">Items</v-tab>
         <v-tab key="categories">Categories</v-tab>
       </v-tabs>
@@ -24,8 +17,8 @@
                   label="What you working on?"
                   name="title"
                   v-model="itemTitle"
+                  @keydown.enter="addNewItem"
                   ref="itemTitle"
-                  :rules="itemRules"
                   outlined
                 ></v-text-field>
               </v-col>
@@ -44,24 +37,50 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col>
+              <v-col class="text-center">
                 <v-btn color="success" @click="addNewItem">Add item</v-btn>
               </v-col>
-              <v-spacer></v-spacer>
-              <v-col v-if="todoItems.length" class="text-end">
-                <v-progress-circular :value="itemsPercentage" size="50" width="4" color="primary">
+              <v-col v-if="todoItems.length">
+                <v-select
+                  :items="filterOptions"
+                  v-model="filterOptionSelected"
+                  outlined
+                  dense
+                  label="Filter"
+                ></v-select>
+              </v-col>
+              <v-col v-if="todoItems.length" class="text-center">
+                <v-progress-circular
+                  :value="itemsPercentage"
+                  size="50"
+                  width="4"
+                  color="primary"
+                  :title="`${doneItems} of ${totalItems} items completed`"
+                >
                   <span>
-                    {{ doneItems}} /
+                    {{doneItems}} /
                     {{totalItems}}
                   </span>
                 </v-progress-circular>
               </v-col>
             </v-row>
-            <v-divider v-if="todoItems.length" class="mt-4"></v-divider>
+            <v-btn
+              color="primary"
+              text
+              v-if="filteredItems.length && filteredItems.some(item => !item.done) && (filterOptionSelected === '' || filterOptionSelected === 'active')"
+              @click="completeAll"
+            >Complete all</v-btn>
+            <v-btn
+              color="primary"
+              text
+              v-if="filteredItems.length && filterOptionSelected === 'completed'"
+              @click="clearCompleted"
+            >Clear completed</v-btn>
+            <v-divider v-if="filteredItems.length" class="mt-4"></v-divider>
             <v-virtual-scroll
-              v-if="todoItems.length"
-              :items="todoItems"
-              height="300"
+              v-if="filteredItems.length"
+              :items="filteredItems"
+              height="250"
               item-height="50"
             >
               <template v-slot="{ item }">
@@ -106,7 +125,6 @@
                     name="title"
                     v-model="categoryTitle"
                     ref="categoryTitle"
-                    :rules="categoryRules"
                     @keydown.enter="addNewCategory"
                     outlined
                   ></v-text-field>
@@ -123,7 +141,6 @@
             <v-divider v-if="categories.length" class="mt-4"></v-divider>
             <v-row>
               <v-col>
-                <!-- <v-chip-group column active-class="primary--text" :v-if="categories.length"> -->
                 <v-chip
                   v-for="(category, i) in categories"
                   outlined
@@ -135,7 +152,6 @@
                   :color="category.color"
                   class="ma-2"
                 >{{ category.title }}</v-chip>
-                <!-- </v-chip-group> -->
               </v-col>
             </v-row>
           </div>
